@@ -1,0 +1,28 @@
+aerospike:
+  image: aerospike/aerospike-server
+#  volumes_from:
+#    - aerospike_data
+  volumes:
+#    - ./data:/opt/aerospike/data # Maps this system to remote
+    - /data:/opt/aerospike/data
+#    - /dev/sdb:/dev/sdb        # Raw device mapping
+    - ./aerospike.conf:/opt/aerospike/etc/aerospike.conf
+#    - ./entrypoint.sh:/entrypoint.sh
+  command: --foreground --config-file /opt/aerospike/etc/aerospike.conf
+  labels:
+    - "com.aerospike.cluster=aerospike"
+  environment:
+    - "affinity:com.aerospike.cluster!=aerospike"
+#  volumes_from:
+#    - aerospike_data
+
+
+#aerospike_data:
+#  image: tianon/true
+#  volumes:
+#    - /data
+#  labels:
+#    - "com.aerospikedata.cluster=something"
+#  environment:
+#    - "affinity:com.aerospikedata.cluster!=something"
+
