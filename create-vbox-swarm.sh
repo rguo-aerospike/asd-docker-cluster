@@ -24,9 +24,9 @@ docker-machine create \
   -d $DRIVER \
   $ENGINE_OPT \
   $B2D_OPT \
-  vb-swarm-consul
+  swarm-consul
 
-docker $(docker-machine config vb-swarm-consul) run \
+docker $(docker-machine config swarm-consul) run \
         -d \
         --restart=always \
         -p "8500:8500" \
@@ -34,7 +34,7 @@ docker $(docker-machine config vb-swarm-consul) run \
         progrium/consul -server -bootstrap
 
 # Create the machine that will be the swarm master        
-CONSUL_IP=$(docker-machine ip vb-swarm-consul)
+CONSUL_IP=$(docker-machine ip swarm-consul)
 
 docker-machine create \
   -d $DRIVER \
@@ -45,7 +45,7 @@ docker-machine create \
   --swarm-discovery="consul://${CONSUL_IP}:8500" \
   --engine-opt="cluster-store=consul://${CONSUL_IP}:8500" \
   --engine-opt="cluster-advertise=eth1:2376" \
-  vb-swarm-0
+  swarm-0
 
 # Create the rest of the machine sin the swarm cluster  
 
@@ -59,5 +59,16 @@ do
     --swarm-discovery="consul://${CONSUL_IP}:8500" \
     --engine-opt="cluster-store=consul://${CONSUL_IP}:8500" \
     --engine-opt="cluster-advertise=eth1:2376" \
-    vb-swarm-$i &
+    swarm-$i &
 done
+
+
+if docker network ls | grep -q "prod"
+  then
+    echo "prod already created, removing first"
+    docker $(docker-machine config --swarm swarm-0) network rm prod
+fi
+
+docker $(docker-machine config --swarm swarm-0) network create --driver overlay prod
+
+eval $(docker-machine env --swarm swarm-0)

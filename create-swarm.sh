@@ -58,7 +58,7 @@ then
         --swarm-discovery="consul://$(docker-machine ip swarm-consul):8500" \
         --engine-opt="cluster-store=consul://$(docker-machine ip swarm-consul):8500" \
         --engine-opt="cluster-advertise=eth0:2376" \
-        vm-swarm-$i
+        vm-swarm-$i &
     done
 else
   seq $SWARM_SIZE | parallel docker-machine create \
@@ -76,13 +76,9 @@ fi
 if docker network ls | grep -q "prod"
   then 
     echo "prod already created, removing first"
-    docker $(docker-machine config swarm-0) network rm prod
+    docker $(docker-machine config --swarm swarm-0) network rm prod
 fi
-docker $(docker-machine config swarm-0) network create --driver overlay prod
 
-# docker $(docker-machine config swarm-0) network create --driver overlay prod
+docker $(docker-machine config --swarm swarm-0) network create --driver overlay prod
 
-# docker $(docker-machine config swarm-0) network connect prod $(docker inspect -f "{{.Id}}" prod_haproxy_1)
-
-# docker run --net prod aerospike/aerospike-tools asinfo -v "tip:host=$(docker inspect -f '{{ .NetworkSettings.Networks.prod.IPAddress }}' prod_aerospike_2);port=3002" -h prod_aerospike_1
-# docker run --net prod aerospike/aerospike-tools asinfo -v "tip:host=$(docker inspect -f '{{ .NetworkSettings.Networks.prod.IPAddress }}' prod_aerospike_3);port=3002" -h prod_aerospike_1
+eval $(docker-machine env --swarm swarm-0)
