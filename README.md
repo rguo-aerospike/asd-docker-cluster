@@ -37,4 +37,4 @@ Build and run the interlock container
 
 ##Confirm cluster:
 
-`docker run --rm --net prod aerospike/aerospike-tools asadm -e i stats -h prod_aerospike_1`
+`docker run --rm --net prod aerospike/aerospike-tools asadm -e i -h prod_aerospike_1`
