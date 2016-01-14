@@ -19,8 +19,11 @@ In case you accidentally close the terminal, you can get the docker client setti
 `eval $(docker-machine env --swarm swarm-0)`
 
 ##Start interlock instance
-This step will be greatly simplified once the interlock container is published.
+Run directly from dockerhub image:
+    
+    docker run --name interlock --net prod -e AEROSPIKE_NETWORK_NAME=prod --rm  -v /var/lib/boot2docker:/etc/docker  rguo/interlock --swarm-url=$DOCKER_HOST --swarm-tls-ca-cert=/etc/docker/ca.pem --swarm-tls-cert=/etc/docker/server.pem --swarm-tls-key=/etc/docker/server-key.pem --debug -p aerospike start
 
+**Old way**
 Build and run the interlock container
 
     eval $(docker-machine env --swarm swarm-0)
