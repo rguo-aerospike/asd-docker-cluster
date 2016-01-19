@@ -19,6 +19,7 @@ In case you accidentally close the terminal, you can get the docker client setti
 `eval $(docker-machine env --swarm swarm-0)`
 
 ##Start interlock instance
+**Manual Method**
 Run directly from dockerhub image:
     
     docker run --name interlock --net prod -e AEROSPIKE_NETWORK_NAME=prod --rm  -v /var/lib/boot2docker:/etc/docker  rguo/interlock --swarm-url=$DOCKER_HOST --swarm-tls-ca-cert=/etc/docker/ca.pem --swarm-tls-cert=/etc/docker/server.pem --swarm-tls-key=/etc/docker/server-key.pem --debug -p aerospike start
@@ -32,9 +33,10 @@ Build and run the interlock container
     make build-container && docker build -t interlock .
     docker run --name interlock --net prod -e AEROSPIKE_NETWORK_NAME=prod --rm  -v /var/lib/boot2docker:/etc/docker  interlock --swarm-url=$DOCKER_HOST --swarm-tls-ca-cert=/etc/docker/ca.pem --swarm-tls-cert=/etc/docker/server.pem --swarm-tls-key=/etc/docker/server-key.pem --debug -p aerospike start
 
-##Create ASD instances
+##Let Compose set everything up
 
     eval $(docker-machine env --swarm swarm-0)
+    docker-compose --x-networking --x-network-driver overlay -p prod up -d
     docker-compose --x-networking --x-network-driver overlay -p prod scale aerospike=SCALE
 
 

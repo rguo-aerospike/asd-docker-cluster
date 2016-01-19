@@ -1,28 +1,26 @@
+interlock:
+  image: rguo/interlock
+  volumes:
+    - /var/lib/boot2docker:/etc/docker
+  command: --swarm-url=$DOCKER_HOST --swarm-tls-ca-cert=/etc/docker/ca.pem --swarm-tls-cert=/etc/docker/server.pem --swarm-tls-key=/etc/docker/server-key.pem --debug -p aerospike start
+  environment:
+    - AEROSPIKE_NETWORK_NAME=docker
+    - AEROSPIKE_CLUSTER_NAME=aerospike
+
 aerospike:
   image: aerospike/aerospike-server
-#  volumes_from:
-#    - aerospike_data
   volumes:
-#    - ./data:/opt/aerospike/data # Maps this system to remote
-    - /data:/opt/aerospike/data
+#    - ./data:/opt/aerospike/data # Maps this system (system that's executing docker-compose) to remote hosts
+    - /data:/opt/aerospike/data  # maps host dir /data to container
 #    - /dev/sdb:/dev/sdb        # Raw device mapping
-    - ./aerospike.conf:/opt/aerospike/etc/aerospike.conf
-#    - ./entrypoint.sh:/entrypoint.sh
+    - ./aerospike.conf:/opt/aerospike/etc/aerospike.conf:ro
   command: --foreground --config-file /opt/aerospike/etc/aerospike.conf
   labels:
     - "com.aerospike.cluster=aerospike"
   environment:
     - "affinity:com.aerospike.cluster!=aerospike"
-#  volumes_from:
-#    - aerospike_data
 
-
-#aerospike_data:
+#aerospike-data:
 #  image: tianon/true
-#  volumes:
-#    - /data
-#  labels:
-#    - "com.aerospikedata.cluster=something"
-#  environment:
-#    - "affinity:com.aerospikedata.cluster!=something"
-
+#  volumes_from: 
+#    - aerospike
