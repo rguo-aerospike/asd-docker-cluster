@@ -13,10 +13,11 @@ aerospike:
   volumes:
 #    - ./data:/opt/aerospike/data # Maps this system (system that's executing docker-compose) to remote hosts
     - /data:/opt/aerospike/data
+    - ./entrypoint.sh:/entrypoint.sh    # Override entrypoint.sh
     - ./aerospike.conf:/opt/aerospike/etc/aerospike.conf:ro
   volumes_from:
     - aerospike-data
-  command: --foreground --config-file /opt/aerospike/etc/aerospike.conf
+  command: --foreground 
   labels:
     - "com.aerospike.cluster=aerospike"
   environment:

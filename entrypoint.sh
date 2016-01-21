@@ -2,13 +2,10 @@
 set -e
 
 # Access interface
-if [ "${1}" == "net" ]; then
-	shift; 
-	INTERFACE=$1
+if [ -f "/opt/aerospike/etc/aerospike.conf" ]; then
+	cp /opt/aerospike/etc/aerospike.conf /etc/aerospike/aerospike.conf
 	PUBLICIP=$(ip a s dev eth0 | grep -Po "(?<=inet )\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
-	echo $PUBLICIP $INTERFACE
-	#sed -i "/port 3000/a \\\t\taccess-address $PUBLICIP virtual" /opt/aerospike/etc/aerospike.conf
-	shift;
+	sed -i "/port 3000/a \\\t\taccess-address $PUBLICIP virtual" /etc/aerospike/aerospike.conf
 fi
 
 # if command starts with an option, prepend asd
