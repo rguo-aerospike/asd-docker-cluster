@@ -6,21 +6,26 @@ interlock:
   environment:
     - AEROSPIKE_NETWORK_NAME=docker
     - AEROSPIKE_CLUSTER_NAME=aerospike
+  net: docker
 
 aerospike:
   image: aerospike/aerospike-server
   volumes:
 #    - ./data:/opt/aerospike/data # Maps this system (system that's executing docker-compose) to remote hosts
-    - /data:/opt/aerospike/data  # maps host dir /data to container
-#    - /dev/sdb:/dev/sdb        # Raw device mapping
+    - /data:/opt/aerospike/data
     - ./aerospike.conf:/opt/aerospike/etc/aerospike.conf:ro
+  volumes_from:
+    - aerospike-data
   command: --foreground --config-file /opt/aerospike/etc/aerospike.conf
   labels:
     - "com.aerospike.cluster=aerospike"
   environment:
     - "affinity:com.aerospike.cluster!=aerospike"
+  net: docker
 
-#aerospike-data:
-#  image: tianon/true
-#  volumes_from: 
-#    - aerospike
+aerospike-data:
+  image: aerospike/aerospike-server
+  entrypoint: tail -f /dev/null
+  volumes:
+    - /opt/aerospike/shadow
+  net: docker

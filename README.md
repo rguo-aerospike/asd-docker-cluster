@@ -43,3 +43,36 @@ Build and run the interlock container
 ##Confirm cluster:
 
 `docker run --rm --net prod aerospike/aerospike-tools asadm -e i -h prod_aerospike_1`
+
+
+## Data Persistance
+
+**Host Data Persistence**
+Data can be persisted to the host that's running the Docker daemon. 
+
+    aerospike:
+      image: aerospike/aerospike-server
+      volumes:
+        - /host/data/dir:/opt/aerospike/data
+       ...
+
+In the above example, each docker host would have the directory `/host/data/dir` created if not already exists. Aerospike will then write to this volume which is mounted under `/opt/aerospike/data`.
+
+**Data-only Container**
+A data-only container is another option to persist data.
+We can define a data-only container that exposes volumes to be used by Aerospike.
+   
+    data:
+      image:aerospike/aerospike-server
+      entrypoint: tail -f /dev/null
+      volumes:
+        - /opt/aerospike/data
+    aerospike:
+      image:aerospike/aerospike-server
+      volumes_from:
+        - data
+      ....
+
+Note that the `volumes_from` parameter replaces the corresponding `volume` parameter from the `aerospike` service definition. The aerospike-server image is chosen for the data-only container to minimize disk usage and the entrypoint overridden to trick docker-compose into keeping the data-only container. Scaling should be done simultaneously, or at least with the data-only container first: `docker-container --x-networking scale data=3 aerospike=3`
+
+A data-only container would give you flexibility that host-based persistence would not, as there is no longer a requirement for identical host configurations.
