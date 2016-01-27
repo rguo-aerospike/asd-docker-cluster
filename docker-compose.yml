@@ -1,12 +1,11 @@
 interlock:
-  image: rguo/interlock
+  image: aerospike/interlock
   volumes:
     - /var/lib/boot2docker:/etc/docker
   command: --swarm-url=$DOCKER_HOST --swarm-tls-ca-cert=/etc/docker/ca.pem --swarm-tls-cert=/etc/docker/server.pem --swarm-tls-key=/etc/docker/server-key.pem --debug -p aerospike start
   environment:
-    - AEROSPIKE_NETWORK_NAME=docker
+    - AEROSPIKE_NETWORK_NAME=prod
     - AEROSPIKE_CLUSTER_NAME=aerospike
-  net: docker
 
 aerospike:
   image: aerospike/aerospike-server
@@ -15,18 +14,16 @@ aerospike:
     - /data:/opt/aerospike/data
     - ./entrypoint.sh:/entrypoint.sh    # Override entrypoint.sh
     - ./aerospike.conf:/opt/aerospike/etc/aerospike.conf:ro
-  volumes_from:
-    - aerospike-data
+#  volumes_from:
+#    - aerospike-data
   command: --foreground 
   labels:
     - "com.aerospike.cluster=aerospike"
   environment:
     - "affinity:com.aerospike.cluster!=aerospike"
-  net: docker
 
-aerospike-data:
-  image: aerospike/aerospike-server
-  entrypoint: tail -f /dev/null
-  volumes:
-    - /opt/aerospike/shadow
-  net: docker
+#aerospike-data:
+#  image: aerospike/aerospike-server
+#  entrypoint: tail -f /dev/null
+#  volumes:
+#    - /opt/aerospike/shadow

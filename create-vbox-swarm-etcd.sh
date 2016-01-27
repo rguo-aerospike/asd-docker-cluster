@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 DRIVER=virtualbox
 SWARM_SIZE=3
 
@@ -37,12 +38,7 @@ do
     swarm-$i &
 done
 
-if docker network ls | grep -q "prod"
-  then 
-    echo "prod already created, removing first"
-    docker $(docker-machine config --swarm swarm-0) network rm prod
-fi
-    
+eval $(docker-machine env --swarm swarm-0)
+
 docker $(docker-machine config --swarm swarm-0) network create --driver overlay prod
 
-eval $(docker-machine env --swarm swarm-0)
